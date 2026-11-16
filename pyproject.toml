@@ -38,6 +38,9 @@ dependencies = [
 dynamic = ["version"] # via setuptools_scm
 
 [project.optional-dependencies]
+ble = [
+    "bleak",
+]
 test = [
     "pytest >= 4.6",
     "pytest-asyncio",

@@ -52,6 +52,8 @@ class Ubus(PDUDriver):
                 "method": "call",
                 "params": [ session, path, method, message ],
             },
+            # an unreachable switch must fail the job, not block the PDU's queue
+            timeout=10,
         )
 
         r.raise_for_status()
