@@ -43,7 +43,7 @@ class Ubus(PDUDriver):
 
         super(Ubus, self).__init__()
 
-    def jsonrpc_call(self, session, path, method, message):
+    def jsonrpc_call(self, session, path, method, message, ok=(0,)):
         r = requests.post(
             f"http://{self.hostname}/ubus",
             json = {
@@ -58,7 +58,7 @@ class Ubus(PDUDriver):
 
         r.raise_for_status()
         result = r.json()["result"]
-        if result[0] != 0:
+        if result[0] not in ok:
             raise RuntimeError(f"ubus {path} {method} failed with status {result[0]}")
         return result[1] if len(result) > 1 else None
 
@@ -93,7 +93,10 @@ class Ubus(PDUDriver):
             {
                 "port": f"lan{port_number}",
                 "enable": True if command == "on" else False
-            }
+            },
+            # shortcut: realtek-poe 1.3 (OpenWrt 24.10) returns the bytes it
+            # sent to the PoE MCU (12) as status, drop 12 once 24.10 is gone
+            ok=(0, 12),
         )
 
     @classmethod
