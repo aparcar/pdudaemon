@@ -49,7 +49,9 @@ class ShellyGen2(PDUDriver):
                 "id": 1,
                 "method": method,
                 "params": params,
-            }
+            },
+            # fail the job instead of blocking the PDU's queue forever
+            timeout=10,
         )
 
         r.raise_for_status()
@@ -62,6 +64,8 @@ class ShellyGen2(PDUDriver):
         return r["output"]
 
     def port_interaction(self, command, port_number):
+        # the HTTP listener passes the port as a string
+        port_number = int(port_number)
         if not 0 <= port_number <= 3:
             raise ValueError("Invalid port number")
 
